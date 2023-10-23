@@ -23,7 +23,7 @@ namespace OneStreamAssessment
                     var content = await response.Content.ReadAsStringAsync();
                     var lakeStats = JsonConvert.DeserializeObject<List<LakeStatistics>>(content);
 
-                    return lakeStats;
+                    return lakeStats ?? new List<LakeStatistics>();
                 }
                 else
                 {
@@ -56,7 +56,7 @@ namespace OneStreamAssessment
                     var content = await response.Content.ReadAsStringAsync();
                     var airStats = JsonConvert.DeserializeObject<List<AirStatistics>>(content);
 
-                    return airStats;
+                    return airStats ?? new List<AirStatistics>();
                 }
                 else
                 {
