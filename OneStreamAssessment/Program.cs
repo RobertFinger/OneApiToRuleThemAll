@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using OneStreamAssessment;
 using OneStreamAssessment.Authentication;
 using System;
@@ -30,7 +31,31 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen( x => {
+    x.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme {
+        Description = "Api key for api keying.",
+        Name= "X-Api-Key",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Scheme = "ApiKeyScheme"
+    });
+
+    var scheme = new OpenApiSecurityScheme {
+        Reference = new OpenApiReference {
+            Type = ReferenceType.SecurityScheme,
+            Id = "ApiKey"
+        },
+        In = ParameterLocation.Header,
+    };
+
+    var requirement = new OpenApiSecurityRequirement
+    {
+        {scheme, new List<string>() }
+    };
+
+    x.AddSecurityRequirement(requirement);
+
+});
 
 builder.Services.AddHttpClient("AirApi", client =>
 {
