@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
+using OneStreamAssessment.Authentication;
 using OneStreamAssessment.Models;
 
 namespace OneStreamAssessment.Controllers
@@ -6,15 +9,17 @@ namespace OneStreamAssessment.Controllers
     //[Authorize]
     [ApiController]
     [Route("[controller]")]
-    //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
+    //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]  //access_as_user
     public class LakeAndWeatherController : ControllerBase
     {
         private readonly DataManager _data;
+        private readonly ApiKeyAuthFilter _filter;
         private readonly ILogger<LakeAndWeatherController> _logger;
 
-        public LakeAndWeatherController(DataManager data,  ILogger<LakeAndWeatherController> logger)
+        public LakeAndWeatherController(DataManager data, ApiKeyAuthFilter filter, ILogger<LakeAndWeatherController> logger)
         {
             _data = data;
+            _filter = filter;
             _logger = logger;
         }
 
@@ -24,11 +29,13 @@ namespace OneStreamAssessment.Controllers
             return await _data.GetDataFromLakeApiAsync();
         }
 
+        [ApiKeyAuthFilter]
         [HttpPost("/lake", Name = "postlake")]
         public async Task<bool> PostLakeData([FromBody] LakeStatistics lake)
         {
             return await _data.PostDataToLakeApiAsync(lake);
         }
+
 
         [HttpGet("/weather", Name = "getweather")]
         public async Task<List<AirStatistics>> GetWeatherData([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
@@ -36,6 +43,7 @@ namespace OneStreamAssessment.Controllers
             return await _data.GetDataFromAirApiAsync();
         }
 
+        [ApiKeyAuthFilter]
         [HttpPost("/weather", Name = "postweather")]
         public async Task<bool> PostWeatherData([FromBody] AirStatistics weather)
         {
