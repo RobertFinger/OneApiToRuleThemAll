@@ -40,7 +40,7 @@ namespace OneStreamAssessment.Controllers
         [HttpGet("/weather", Name = "getweather")]
         public async Task<List<AirStatistics>> GetWeatherData([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            return await _data.GetDataFromAirApiAsync();
+            return await _data.GetDataFromAirApiAsync(); 
         }
 
         [ApiKeyAuthFilter]

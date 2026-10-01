@@ -1,14 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OneStreamAssessment;
 using OneStreamAssessment.Authentication;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-
+builder.Services.AddCors();
 builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -71,13 +64,19 @@ builder.Services.AddScoped<DataManager>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
     
 }
+
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()  
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
 
 app.UseHttpsRedirection();
 
